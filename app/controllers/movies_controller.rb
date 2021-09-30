@@ -5,27 +5,34 @@ class MoviesController < ApplicationController
       @movie = Movie.find(id) # look up movie by unique ID
       # will render app/views/movies/show.<extension> by default
     end
-  
+    
     def index
+      @query = Movie
       @sortedBy = nil
       @filterRatings = nil
-      @query = Movie
-      @movies = @query.all
       @allRatings = Movie.uniq.pluck('rating')
       
+      if params.has_key?('reset') and params[:reset]
+        puts "[X] Called reset session function"
+        session.clear
+        @filterRatings = Movie.uniq.pluck('rating')
+        @movies = Movie.all
+        return
+      end
+      
       if !params.has_key?('ratings_filter') and !params.has_key?('sort_by') and (session.has_key?('ratings_filter') or session.has_key?('sort_by'))
-        puts "[X] Redirection + Populating from session - #{session[:ratings_filter]} #{session[:sort_by]}"
+        puts "[X] Redirection + populating from session - #{session[:ratings_filter]}, #{session[:sort_by]}"
         if session.has_key?('ratings_filter')
           params[:ratings_filter] = session[:ratings_filter]
         end
         if session.has_key?('sort_by')
           params[:sort_by] = session[:sort_by]
         end
+        flash.keep
         redirect_to movies_path(params)
       end
       
       if params.has_key?('ratings_filter')
-        puts "filter tags #{@filterRatings} #{params[:ratings_filter]}"
         @filterRatings = params[:ratings_filter].keys
         @query = @query.where(rating: @filterRatings)
         session[:ratings_filter] = params[:ratings_filter]
@@ -52,7 +59,6 @@ class MoviesController < ApplicationController
       else
         @movies = @query.all
       end
-    
     end
   
     def new

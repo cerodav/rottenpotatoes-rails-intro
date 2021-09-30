@@ -3,13 +3,14 @@
 
 <%#  Part 2: Checkbox creation for Ratings filter logic here %>
 <% if !@allRatings.empty? %>
-  <%= form_tag movies_path, :method => 'get', :id => 'ratings_form' do %>
+  <%= form_tag movies_path, :method => 'get', :id => 'ratings_form', :style => 'margin-bottom:10px' do %>
     <span style='font-weight: bold'>Ratings : </span>&nbsp;&nbsp;
     <% @allRatings.each do |rating| %>
       <input type="checkbox" id="<%= "ratings_#{rating}" %>" name="<%= "ratings_filter[#{rating}]" %>" value=1 <%= @filterRatings.include?(rating) ? 'checked' : '' %> >
       <span><%= "#{rating}" %></span>&nbsp;&nbsp;
     <% end %>
     <%= submit_tag 'Refresh', :class => 'btn btn-primary', :id => 'ratings_submit' %>
+    <%= link_to 'Reset', movies_path(:reset => true), :class => 'btn btn-primary', :style => 'float:right' %>
   <% end %>
 <% end %>
 
